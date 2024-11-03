@@ -30,4 +30,8 @@ class LoginController extends Controller
 
         return response()->json(['user' =>$user->toArray(),'access_token' => $token,]);
     }
+    public function logout(Request $request) {
+        $request->user()->tokens()->delete();
+        return response()->json(['message' => 'Sesión cerrada con éxito.'], 200);
+    }
 }

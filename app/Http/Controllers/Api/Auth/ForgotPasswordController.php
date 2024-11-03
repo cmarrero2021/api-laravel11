@@ -14,7 +14,7 @@ class ForgotPasswordController extends Controller
     public function sendResetLink(Request $request)
     {
         $request->validate([
-            'email' => 'equired|string|email',
+            'email' => 'required|string|email',
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -26,11 +26,13 @@ class ForgotPasswordController extends Controller
         if (!$user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Debes verificar tu correo electrónico antes de cambiar la contraseña.'], 403);
         }
-
         $token = Str::random(60);
-        $user->password_reset_token = $token;
-        $user->password_reset_expires_at = now()->addMinutes(60);
-        $user->save();
+        \DB::table('password_reset_tokens')->insert([
+            'email' => $user->email,
+            'token' => $token,
+            'created_at' => now(),
+            'expires_at' => now()->addMinutes(60),
+        ]);
 
         $resetUrl = URL::signedRoute('auth.reset-password', [
             'token' => $token,
@@ -45,9 +47,9 @@ class ForgotPasswordController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'token' => 'equired|string',
-            'email' => 'equired|string|email',
-            'password' => 'equired|string|confirmed',
+            'token' => 'required|string',
+            'email' => 'required|string|email',
+            'password' => 'required|string|confirmed',
         ]);
 
         $user = User::where('email', $request->email)->first();
