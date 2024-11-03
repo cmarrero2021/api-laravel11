@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-// use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Database\Seeders\RolesAndPermissionsSeeder;
-use Database\Seeders\CreateAdminUserSeeder;
+// use Database\Seeders\RolesAndPermissionsSeeder;
+// use Database\Seeders\CreateAdminUserSeeder;
 
 
 class DatabaseSeeder extends Seeder

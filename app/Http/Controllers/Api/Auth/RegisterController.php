@@ -55,6 +55,7 @@ class RegisterController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'email_verified_at' => null,
+            'requires_password_change' => false
         ]);
         $user->assignRole('usuario');
         $this->sendVerificationEmail($user);

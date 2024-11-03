@@ -25,6 +25,12 @@ class LoginController extends Controller
         if (!$user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Debes verificar tu correo electrónico antes de iniciar sesión.'], 403);
         }
+        if ($user->requires_password_change) {
+            return response()->json(['message' => 'Debes cambiar tu clave por primera vez. Dirígete a Olvidé mi clave','accion' =>1], 401);
+        }
+        if (!$user->active) {
+            return response()->json(['message' => 'Usuario marcado como inactivo. Comunicate con el administrador del sistema','accion' =>2], 401);
+        }
 
         $token = $user->createToken('auth_token', ['expires_at' => now()->addMinutes(60)])->plainTextToken;
         $user->tokens()->where('token', hash('sha256', explode('|', $token)[1]))

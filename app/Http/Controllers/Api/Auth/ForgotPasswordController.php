@@ -65,6 +65,7 @@ class ForgotPasswordController extends Controller
         $user->password = Hash::make($request->password);
         $user->password_reset_token = null;
         $user->password_reset_expires_at = null;
+        $user->requires_password_change = false;
         $user->save();
 
         return response()->json(['message' => 'Contraseña cambiada con éxito.'], 200);
