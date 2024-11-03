@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
+use Spatie\Permission\Models\Role;
 class RegisterController extends Controller
 {
     public function register(Request $request) {
@@ -55,6 +56,7 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
             'email_verified_at' => null,
         ]);
+        $user->assignRole('usuario');
         $this->sendVerificationEmail($user);
         return response()->json(['message' => 'Usuario creado con éxito. Verifica tu correo electrónico para activar tu cuenta.'], 201);
     }
