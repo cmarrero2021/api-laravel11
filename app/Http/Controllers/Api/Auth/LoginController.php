@@ -26,12 +26,19 @@ class LoginController extends Controller
             return response()->json(['message' => 'Debes verificar tu correo electrónico antes de iniciar sesión.'], 403);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
+        $token = $user->createToken('auth_token', ['expires_at' => now()->addMinutes(60)])->plainTextToken;
+        $user->tokens()->where('token', hash('sha256', explode('|', $token)[1]))
+        ->update(['expires_at' => now()->addMinutes(60)]);
         return response()->json(['user' =>$user->toArray(),'access_token' => $token,]);
     }
     public function logout(Request $request) {
-        $request->user()->tokens()->delete();
-        return response()->json(['message' => 'Sesión cerrada con éxito.'], 200);
+        $user = $request->user();
+
+        if ($user) {
+            $user->tokens()->delete();
+            return response()->json(['message' => 'Sesión cerrada con éxito.'], 200);
+        }
+
+        return response()->json(['message' => 'Usuario no autenticado.'], 401);
     }
 }
