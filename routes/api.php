@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Auth\{
     ForgotPasswordController
 };
 use App\Http\Controllers\Api\Users\UserController;
+use App\Http\Controllers\Api\Security\PermisionController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -23,9 +24,12 @@ Route::post('/auth/reset-password', [ForgotPasswordController::class, 'resetPass
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/auth/logout', [LoginController::class, 'logout'])->name('auth.logout');
 });
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api','role:admin|supervisor'])->group(function () {
     Route::get('/usuarios', [UserController::class, 'index']);
+    Route::get('/usuario/{id}', [UserController::class, 'show']);
     Route::post('/usuarios', [UserController::class, 'store']);
     Route::post('/usuarios/{id}', [UserController::class, 'update']);
     Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
+    Route::apiResource('/permissions', PermisionController::class);
 });
+

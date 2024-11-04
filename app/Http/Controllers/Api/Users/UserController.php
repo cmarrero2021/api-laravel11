@@ -25,6 +25,18 @@ class UserController extends Controller
         $usuarios = User::orderByRaw("CASE WHEN name = 'Admin' THEN 0 ELSE 1 END, name ASC")->get();
         return response()->json(['usuarios' => $usuarios], 200);
     }
+    public function show($id)
+    {
+        if (!auth()->user()->hasPermissionTo('ver usuarios')) {
+            return response()->json(['message' => 'No tiene permiso para ver usuarios'], 403);
+        }
+        $usuario = User::find($id);
+        if (!$usuario) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+        return response()->json(['usuario' => $usuario], 200);
+        // return response()->json(['message' => 'Usuario eliminado con éxito'], 200);
+    }
 
     /**
      * Store a newly created user in storage.
