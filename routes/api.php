@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Auth\{
 };
 use App\Http\Controllers\Api\Users\UserController;
 use App\Http\Controllers\Api\Security\PermisionController;
+use App\Http\Controllers\Api\Security\RoleController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -30,6 +31,22 @@ Route::middleware(['auth:api','role:admin|supervisor'])->group(function () {
     Route::post('/usuarios', [UserController::class, 'store']);
     Route::post('/usuarios/{id}', [UserController::class, 'update']);
     Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
-    Route::apiResource('/permissions', PermisionController::class);
+
+    Route::get('/permissions', [PermisionController::class, 'index']);
+    Route::get('/permissions/{id}', [PermisionController::class, 'show']);
+    Route::post('/permissions', [PermisionController::class, 'store']);
+    Route::post('/permissions/{id}', [PermisionController::class, 'update']);
+    Route::delete('/permissions/{id}', [PermisionController::class, 'destroy']);
+
+    Route::get('/roles', [RoleController::class, 'index']);
+    Route::get('/roles/{id}', [RoleController::class, 'show']);
+    Route::post('/roles', [RoleController::class, 'store']);
+    Route::post('/roles/{id}', [RoleController::class, 'update']);
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
+    Route::post('/roles/{roleId}/permissions/assign', [RoleController::class, 'assignPermissions'])
+    ->name('roles.permissions.assign');
+    Route::delete('/roles/{roleId}/permissions/remove', [RoleController::class, 'removePermissions'])
+        ->name('roles.permissions.remove');
+
 });
 
