@@ -31,13 +31,11 @@ Route::middleware(['auth:api','role:admin|supervisor'])->group(function () {
     Route::post('/usuarios', [UserController::class, 'store']);
     Route::post('/usuarios/{id}', [UserController::class, 'update']);
     Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
-
     Route::get('/permissions', [PermisionController::class, 'index']);
     Route::get('/permissions/{id}', [PermisionController::class, 'show']);
     Route::post('/permissions', [PermisionController::class, 'store']);
     Route::post('/permissions/{id}', [PermisionController::class, 'update']);
     Route::delete('/permissions/{id}', [PermisionController::class, 'destroy']);
-
     Route::get('/roles', [RoleController::class, 'index']);
     Route::get('/roles/{id}', [RoleController::class, 'show']);
     Route::post('/roles', [RoleController::class, 'store']);
@@ -47,6 +45,9 @@ Route::middleware(['auth:api','role:admin|supervisor'])->group(function () {
     ->name('roles.permissions.assign');
     Route::delete('/roles/{roleId}/permissions/remove', [RoleController::class, 'removePermissions'])
         ->name('roles.permissions.remove');
-
+    Route::post('/users/assign-roles', [UserController::class, 'assignRoles'])
+        ->name('users.assign-roles');
+    Route::delete('/users/remove-roles', [UserController::class, 'removeRoles'])
+        ->name('users.remove-roles');
 });
 

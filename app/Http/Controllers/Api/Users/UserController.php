@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Users;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
@@ -129,5 +130,50 @@ class UserController extends Controller
         }
         $usuario->delete();
         return response()->json(['message' => 'Usuario eliminado con éxito'], 200);
+    }
+    ////////Roles/////////
+    public function assignRoles(Request $request)
+    {
+        $userIds = $request->input('user_ids');
+        $roleIds = $request->input('role_ids');
+        if (!$userIds ||!is_array($userIds) ||!$roleIds ||!is_array($roleIds)) {
+            return response()->json(['message' => 'Se requieren IDs de usuarios y roles para asignar'], 422);
+        }
+        $users = User::whereIn('id', $userIds)->get();
+        if ($users->count()!== count($userIds)) {
+            return response()->json(['message' => 'Algunos usuarios no fueron encontrados'], 404);
+        }
+        $roles = Role::whereIn('id', $roleIds)->get();
+        if ($roles->count()!== count($roleIds)) {
+            return response()->json(['message' => 'Algunos roles no fueron encontrados'], 404);
+        }
+        foreach ($users as $user) {
+            $user->assignRole($roles);
+        }
+        return response()->json(['message' => 'Roles asignados con éxito a usuarios']);
+    }
+    public function removeRoles(Request $request)
+    {
+        $userIds = $request->input('user_ids');
+        $roleIdsToRemove = $request->input('role_ids');
+        if (!$userIds ||!is_array($userIds) ||!$roleIdsToRemove ||!is_array($roleIdsToRemove)) {
+            return response()->json(['message' => 'Se requieren IDs de usuarios y roles para remover'], 422);
+        }
+        $users = User::whereIn('id', $userIds)->get();
+        if ($users->count()!== count($userIds)) {
+            return response()->json(['message' => 'Algunos usuarios no fueron encontrados'], 404);
+        }
+        $protectedUserId = 1;
+        $protectedRoleId = 3;
+        foreach ($users as $user) {
+            $rolesToRemoveForUser = $roleIdsToRemove;
+            if ($user->id === $protectedUserId) {
+                $rolesToRemoveForUser = array_diff($rolesToRemoveForUser, [$protectedRoleId]);
+            }
+            $userRoles = $user->roles()->pluck('id');
+            $rolesToKeep = $userRoles->diff($rolesToRemoveForUser);
+            $user->syncRoles($rolesToKeep);
+        }
+        return response()->json(['message' => 'Roles removidos con éxito de usuarios']);
     }
 }
