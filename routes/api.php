@@ -9,8 +9,10 @@ use App\Http\Controllers\Api\Auth\{
     ForgotPasswordController
 };
 use App\Http\Controllers\Api\Users\UserController;
-use App\Http\Controllers\Api\Security\PermisionController;
+use App\Http\Controllers\Api\Security\PermissionController;
 use App\Http\Controllers\Api\Security\RoleController;
+use App\Http\Middleware\CheckPermissionOrAdmin;
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -25,29 +27,27 @@ Route::post('/auth/reset-password', [ForgotPasswordController::class, 'resetPass
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/auth/logout', [LoginController::class, 'logout'])->name('auth.logout');
 });
+
 Route::middleware(['auth:api','role:admin|supervisor'])->group(function () {
-    Route::get('/usuarios', [UserController::class, 'index']);
-    Route::get('/usuario/{id}', [UserController::class, 'show']);
-    Route::post('/usuarios', [UserController::class, 'store']);
-    Route::post('/usuarios/{id}', [UserController::class, 'update']);
-    Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
-    Route::get('/permissions', [PermisionController::class, 'index']);
-    Route::get('/permissions/{id}', [PermisionController::class, 'show']);
-    Route::post('/permissions', [PermisionController::class, 'store']);
-    Route::post('/permissions/{id}', [PermisionController::class, 'update']);
-    Route::delete('/permissions/{id}', [PermisionController::class, 'destroy']);
-    Route::get('/roles', [RoleController::class, 'index']);
-    Route::get('/roles/{id}', [RoleController::class, 'show']);
-    Route::post('/roles', [RoleController::class, 'store']);
-    Route::post('/roles/{id}', [RoleController::class, 'update']);
-    Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
-    Route::post('/roles/{roleId}/permissions/assign', [RoleController::class, 'assignPermissions'])
-    ->name('roles.permissions.assign');
-    Route::delete('/roles/{roleId}/permissions/remove', [RoleController::class, 'removePermissions'])
-        ->name('roles.permissions.remove');
-    Route::post('/users/assign-roles', [UserController::class, 'assignRoles'])
-        ->name('users.assign-roles');
-    Route::delete('/users/remove-roles', [UserController::class, 'removeRoles'])
-        ->name('users.remove-roles');
+    Route::middleware(CheckPermissionOrAdmin::class.':ver usuarios')->get('/users', [UserController::class, 'index'])->name('users.list');
+    Route::middleware(CheckPermissionOrAdmin::class.':mostrar usuario')->get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+    Route::middleware(CheckPermissionOrAdmin::class.':crear usuarios')->post('/users', [UserController::class, 'store'])->name('users.create');
+    Route::middleware(CheckPermissionOrAdmin::class.':actualizar usuarios')->post('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::middleware(CheckPermissionOrAdmin::class.':eliminar usuarios')->delete('/users/{id}', [UserController::class, 'destroy'])->name('users.delete');
+    Route::middleware(CheckPermissionOrAdmin::class.':asignar rol usuarios')->post('/assign-roles', [UserController::class, 'assignRoles'])->name('users.assign-roles');
+    Route::middleware(CheckPermissionOrAdmin::class.':remover rol usuarios')->delete('/remove-roles', [UserController::class, 'removeRoles'])->name('users.remove-roles');
+    Route::middleware(CheckPermissionOrAdmin::class.':ver permisos')->get('/permissions', [PermissionController::class, 'index'])->name('permissions.list');
+    Route::middleware(CheckPermissionOrAdmin::class.':mostrar permiso')->get('/permissions/{id}', [PermissionController::class, 'show'])->name('permissions.show');
+    Route::middleware(CheckPermissionOrAdmin::class.':crear permisos')->post('/permissions', [PermissionController::class, 'store'])->name('permissions.create');
+    Route::middleware(CheckPermissionOrAdmin::class.':actualizar permisos')->post('/permissions/{id}', [PermissionController::class, 'update'])->name('permissions.update');
+    Route::middleware(CheckPermissionOrAdmin::class.':eliminar permisos')->delete('/permissions/{id}', [PermissionController::class, 'destroy'])->name('permissions.delete');
+    Route::middleware(CheckPermissionOrAdmin::class.':ver roles')->get('/roles', [RoleController::class, 'index'])->name('roles.list');
+    Route::middleware(CheckPermissionOrAdmin::class.':mostrar rol')->get('/roles/{id}', [RoleController::class, 'show'])->name('roles.show');
+    Route::middleware(CheckPermissionOrAdmin::class.':crear roles')->post('/roles', [RoleController::class, 'store'])->name('roles.create');
+    Route::middleware(CheckPermissionOrAdmin::class.':actualizar roles')->post('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
+    Route::middleware(CheckPermissionOrAdmin::class.':eliminar roles')->delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.delete');
+    Route::middleware(CheckPermissionOrAdmin::class.':asignar permisos')->post('/roles/permissions/assign/{id}', [RoleController::class, 'assignPermissions'])->name('roles.permissions.assign');
+    Route::middleware(CheckPermissionOrAdmin::class.':remover permisos')->delete('/roles/permissions/remove/{role}', [RoleController::class, 'removePermissions'])->name('roles.permissions.remove');
+
 });
 

@@ -91,8 +91,8 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!auth()->user()->hasPermissionTo('editar usuarios')) {
-            return response()->json(['message' => 'No tiene permiso para editar usuarios'], 403);
+        if (!auth()->user()->hasPermissionTo('actualizar usuarios')) {
+            return response()->json(['message' => 'No tiene permiso para actualizar usuarios'], 403);
         }
         $usuario = User::find($id);
         if (!$usuario) {
@@ -132,8 +132,16 @@ class UserController extends Controller
         return response()->json(['message' => 'Usuario eliminado con éxito'], 200);
     }
     ////////Roles/////////
+/*
+    public function assignRoles(Request $request) {
+        info($request->all());
+        return response()->json(['message' => 'PEPE'],200);
+    }
+*/
+
     public function assignRoles(Request $request)
     {
+        info($request->all());
         $userIds = $request->input('user_ids');
         $roleIds = $request->input('role_ids');
         if (!$userIds ||!is_array($userIds) ||!$roleIds ||!is_array($roleIds)) {
@@ -152,6 +160,7 @@ class UserController extends Controller
         }
         return response()->json(['message' => 'Roles asignados con éxito a usuarios']);
     }
+
     public function removeRoles(Request $request)
     {
         $userIds = $request->input('user_ids');

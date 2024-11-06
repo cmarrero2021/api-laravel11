@@ -13,7 +13,8 @@ class CreateAdminUserSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@correo.com',
             'password' => bcrypt('123'),
-            'email_verified_at' => '2024-11-03 18:03:56'
+            'email_verified_at' => '2024-11-03 18:03:56',
+            'requires_password_change' => false
         ]);
         $role = Role::findByName('admin', 'api');
         $user->assignRole($role);

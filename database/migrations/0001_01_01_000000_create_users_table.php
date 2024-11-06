@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->boolean('requires_password_change')->default(true)->nullable();
+            $table->boolean('active')->default(true)->nullable();
             $table->timestamps();
         });
 
@@ -25,6 +27,7 @@ return new class extends Migration
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
+            $table->timestamp('expires_at')->nullable()->after('token');
         });
 
         Schema::create('sessions', function (Blueprint $table) {

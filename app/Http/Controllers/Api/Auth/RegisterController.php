@@ -50,6 +50,7 @@ class RegisterController extends Controller
         if (!empty($errors)) {
             return response()->json(['errors' => $errors], 422);
         }
+        \DB::enableQueryLog();
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -57,6 +58,7 @@ class RegisterController extends Controller
             'email_verified_at' => null,
             'requires_password_change' => false
         ]);
+        info(\DB::getQueryLog());
         $user->assignRole('usuario');
         $this->sendVerificationEmail($user);
         return response()->json(['message' => 'Usuario creado con éxito. Verifica tu correo electrónico para activar tu cuenta.'], 201);
